@@ -1,0 +1,60 @@
+# https://taskfile.dev
+
+version: "3"
+
+output: prefixed
+
+tasks:
+  default:
+    cmds:
+      - task --list-all
+  db-setup:
+    cmds:
+      - rails db:create
+      - rails db:migrate
+      - rails db:seed
+  db-reset:
+    cmds:
+      - rails db:drop
+      - task db-setup
+  puma-dev-link:
+    cmds:
+      - puma-dev link -n groovestack-core .
+  jobs-run:
+    cmds:
+      - bundle exec que
+    prefix: jobs
+  mailer-serve:
+    cmds:
+      - mailhog
+    prefix: mailer
+  rails-logs-tail:
+    cmds:
+      - tail -f log/development.log
+    prefix: rails-logs
+  puma-reset:
+    cmds:
+      - puma-dev --stop
+  dev:
+    cmds:
+      - bin/dev
+    prefix: rails-vite
+  dev-full:
+    deps:
+      - task: dev
+      - task: jobs-run
+      - task: mailer-serve
+      - task: rails-logs-tail
+  dev-reset:
+    cmds:
+      - task puma-reset
+      - task dev
+  dev-reset-full:
+    cmds:
+      - task puma-reset
+      - task dev-full
+  setup:
+    cmds:
+      - bundle install
+      - task db-setup
+      - task puma-dev-link

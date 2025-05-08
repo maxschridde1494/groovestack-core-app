@@ -36,10 +36,13 @@ Rails.application.configure do
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
 
-  # Don't care if the mailer can't send.
-  config.action_mailer.raise_delivery_errors = false
-
+  config.action_mailer.raise_delivery_errors = true
   config.action_mailer.perform_caching = false
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: 'localhost',
+    port: 1025,
+  }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
@@ -73,4 +76,16 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions
   config.action_controller.raise_on_missing_callback_actions = true
+
+  config.hosts = ['localhost', '127.0.0.1', 'groovestack-core.test']
 end
+
+
+host_options = {
+  host: 'groovestack-core.test',
+  protocol: 'https'
+}
+
+Rails.application.routes.default_url_options = host_options
+Rails.application.config.action_controller.asset_host
+Rails.application.config.action_mailer.asset_host = host_options[:host]
