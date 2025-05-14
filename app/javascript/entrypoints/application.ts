@@ -3,15 +3,12 @@
 //
 //    <%= vite_client_tag %>
 //    <%= vite_javascript_tag 'application' %>
-console.log('Vite ⚡️ Rails')
 
 // If using a TypeScript entrypoint file:
 //     <%= vite_typescript_tag 'application' %>
 //
 // If you want to use .jsx or .tsx, add the extension:
 //     <%= vite_javascript_tag 'application.jsx' %>
-
-console.log('Visit the guide for more information: ', 'https://vite-ruby.netlify.app/guide/rails')
 
 // Example: Load Rails libraries in Vite.
 //
@@ -30,5 +27,8 @@ console.log('Visit the guide for more information: ', 'https://vite-ruby.netlify
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { App } from "../src/App";
+
+// https://stackoverflow.com/questions/7131909/facebook-callback-appends-to-return-url
+if (window.location.hash == "#_=_") window.location.hash = "";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(React.createElement(App));

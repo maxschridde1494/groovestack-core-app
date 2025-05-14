@@ -18,7 +18,7 @@ gem "puma", ">= 5.0"
 gem "importmap-rails"
 
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
-gem "turbo-rails"
+# gem "turbo-rails"
 
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails"
@@ -53,6 +53,7 @@ end
 
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
+  gem 'graphiql-rails' # graphql api introspection
   gem "web-console"
 
   # Add speed badges [https://github.com/MiniProfiler/rack-mini-profiler]
@@ -68,4 +69,20 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
+end
+
+gem "devise-passwordless"
+gem 'omniauth-apple'
+gem 'omniauth-facebook'
+gem 'omniauth-google-oauth2', '1.1.2'
+gem "omniauth-rails_csrf_protection", '1.0.1'
+
+gem 'groovestack-base', '~>0.1.12'
+gem 'groovestack-config', '~>0.1.4'
+gem 'groovestack-identities', '~>0.1.3'
+gem 'groovestack-auth', '~>0.1.6'
+
+gem "que", github: "talysto/que", branch: "master"
+github "talysto/groovestack-core", branch: "core-auth-sans-devise_token_auth" do
+  gem "core-jobs"
 end
