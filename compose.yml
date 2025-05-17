@@ -3,6 +3,8 @@ version: "3.9"
 #############################
 # DRY-ed-up shared settings #
 #############################
+# Base configuration shared between web and worker services
+# Includes common build settings, dependencies, and environment variables
 x-app-base: &app_base
   build:
     context: .
@@ -15,7 +17,10 @@ x-app-base: &app_base
   environment:
     DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-groovestack_core_app_development}
     RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+
 services:
+  # PostgreSQL Database Service
+  # Provides persistent data storage with health checks and resource limits
   db:
     container_name: groovestack-core-pg-db
     image: postgres:16
@@ -24,9 +29,9 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-groovestack_core_app_development}
     ports:
-      - "5432:5432"
+      - "5432:5432"  # Expose PostgreSQL port for external connections
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data  # Persistent data storage
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -38,37 +43,47 @@ services:
           memory: 1G
         reservations:
           memory: 512M
+
+  # MailHog Service
+  # Development email testing service that captures all outgoing emails
+  # Provides both SMTP server and web interface for viewing emails
   mailhog:
     image: mailhog/mailhog:latest
-    container_name: mailhog        # optional, makes `docker ps` nicer
+    container_name: mailhog
     ports:
-      # SMTP interface (Mailers send here)
-      - "1025:1025"
-      # Web UI (in-browser inbox)
-      - "8025:8025"
-    restart: unless-stopped        # it’ll auto-restart with the rest of the stack
-  
+      - "1025:1025"  # SMTP server port for sending emails
+      - "8025:8025"  # Web UI port for viewing captured emails
+    restart: unless-stopped
+
+  # Background Worker Service
+  # Handles asynchronous jobs and background processing
+  # Shares base configuration with web service
   worker:
     <<: *app_base  
     container_name: groovestack-core-worker
     command: task jobs-run
     volumes:
-      - .:/usr/local/groovestack-core-app:cached
-      - bundle:/usr/local/bundle
+      - .:/usr/local/groovestack-core-app:cached  # Mount application code
+      - bundle:/usr/local/bundle  # Persistent bundle storage
+
+  # Web Application Service
+  # Main application server handling HTTP requests
+  # Includes development-specific configurations and hot-reloading
   web:
     <<: *app_base 
     container_name: groovestack-core-app
     command: task dev
     ports:
-      - "5173:5173"
-      - "3036:3036"
-      - "127.0.0.1:3000:3000"   # Only host loopback, not all interfaces
+      - "5173:5173"  # Vite dev server port
+      - "3036:3036"  # Additional Vite port
+      - "127.0.0.1:3000:3000"   # Rails server (localhost only)
     volumes:
-      - .:/usr/local/groovestack-core-app:cached
-      - bundle:/usr/local/bundle
-      - node_modules:/usr/local/groovestack-core-app/node_modules
+      - .:/usr/local/groovestack-core-app:cached  # Mount application code
+      - bundle:/usr/local/bundle  # Persistent bundle storage
+      - node_modules:/usr/local/groovestack-core-app/node_modules  # Persistent node_modules
     tty: true
     stdin_open: true
+    # Development-specific file watching and rebuild triggers
     develop:
       watch:
         - path: ./app
@@ -89,7 +104,8 @@ services:
         reservations:
           memory: 1G
 
+# Named volumes for persistent data storage
 volumes:
-  pgdata:
-  bundle:
-  node_modules:
+  pgdata:      # PostgreSQL data
+  bundle:      # Ruby gems
+  node_modules: # Node.js dependencies
