@@ -28,3 +28,7 @@ Devise.setup do |config|
     manager.failure_app = FailureWithMetadata
   end
 end
+
+::Groovestack::Base.configure do |config|
+  config.error_notifier.notify_method = :info
+end

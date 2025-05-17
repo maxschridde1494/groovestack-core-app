@@ -1,6 +1,6 @@
 interface GenerateFetchClientProps {
-  body?: string
-  headers?: { [key: string]: string }
+  body?: BodyInit
+  headers?: Headers
   method: string
   path: string
   baseUrl?: string
@@ -8,29 +8,24 @@ interface GenerateFetchClientProps {
 
 export const generateFetchRequest = ({
   body,
-  headers = {},
+  headers = new Headers(),
   method,
   path,
-  baseUrl = window.location.host,
+  baseUrl = window.location.origin,
 }: GenerateFetchClientProps): Request => {
-  const requestArgs: { method: string; headers: Headers; body?: string } = {
-    method: method,
-    headers: new Headers(
-      Object.assign(
-        {
-          'Content-Type': 'application/json',
-        },
-        headers
-      )
-    ),
-  }
+  const requestArgs: RequestInit = {
+    method,
+    headers: new Headers({
+      'Content-Type': 'application/json',
+      ...headers,
+    }),
+    ...(body ? { body } : {}),
+  };
 
-  if (body) requestArgs.body = body
+  const url = new URL(path, baseUrl).toString();
 
-  const request = new Request(`https://${baseUrl}${path}`, requestArgs)
-
-  return request
-}
+  return new Request(url, requestArgs);
+};
 
 type SimpleFetchParamsType = { 
   errMsgResolver?: (data: any) => string;
@@ -51,7 +46,7 @@ export const simpleFetch = async ({ errMsgResolver, onError, onSuccess, requestW
     }
 
     if (onSuccess) onSuccess(data)
-  } catch(e){
+  } catch(e: any){
     console.error(e)
     if (onError) onError(e)
   }

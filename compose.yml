@@ -1,0 +1,95 @@
+version: "3.9"
+
+#############################
+# DRY-ed-up shared settings #
+#############################
+x-app-base: &app_base
+  build:
+    context: .
+    target: groovestack-core-dev
+  depends_on:
+    db:
+      condition: service_healthy
+    mailhog:
+      condition: service_started
+  environment:
+    DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-groovestack_core_app_development}
+    RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+services:
+  db:
+    container_name: groovestack-core-pg-db
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-groovestack_core_app_development}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mailhog        # optional, makes `docker ps` nicer
+    ports:
+      # SMTP interface (Mailers send here)
+      - "1025:1025"
+      # Web UI (in-browser inbox)
+      - "8025:8025"
+    restart: unless-stopped        # it’ll auto-restart with the rest of the stack
+  
+  worker:
+    <<: *app_base  
+    container_name: groovestack-core-worker
+    command: task jobs-run
+    volumes:
+      - .:/usr/local/groovestack-core-app:cached
+      - bundle:/usr/local/bundle
+  web:
+    <<: *app_base 
+    container_name: groovestack-core-app
+    command: task dev
+    ports:
+      - "5173:5173"
+      - "3036:3036"
+      - "127.0.0.1:3000:3000"   # Only host loopback, not all interfaces
+    volumes:
+      - .:/usr/local/groovestack-core-app:cached
+      - bundle:/usr/local/bundle
+      - node_modules:/usr/local/groovestack-core-app/node_modules
+    tty: true
+    stdin_open: true
+    develop:
+      watch:
+        - path: ./app
+          action: sync
+          target: /app
+        - path: ./Gemfile
+          action: rebuild
+        - path: ./Gemfile.lock
+          action: rebuild
+        - path: ./package.json
+          action: rebuild
+        - path: ./pnpm-lock.yaml
+          action: rebuild
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+
+volumes:
+  pgdata:
+  bundle:
+  node_modules:

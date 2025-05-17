@@ -58,3 +58,57 @@ tasks:
       - bundle install
       - task db-setup
       - task puma-dev-link
+  docker-rails-console:
+    desc: "Open a rails console in the container. Removes container on exit."
+    cmds:
+      - docker compose run --rm web rails c
+  docker-rails-logs:
+    desc: "Tail rails logs in the container"
+    cmds:
+      - docker compose logs -f web
+  docker-container-logs:
+    desc: "Tail logs for a all containers"
+    cmds:
+      - docker compose logs -f
+  docker-compose-watch:
+    cmds:
+      - docker compose watch
+  docker-compose-up:
+    cmds:
+      - docker compose up -d --build
+  docker-compose-down:
+    desc: "tear down compose stack. volumes are preserved."
+    cmds:
+      - docker compose down
+  docker-compose-down-volumes:
+    desc: "tear down compose stack and volumes"
+    cmds:
+      - docker compose down --volumes
+  docker-build:
+    cmds:
+      - docker build -t maxschridde/groovestack-core-app .
+  docker-tag:
+    desc: "Tag the image with label and version - here, we use the latest tag"
+    cmds:
+      - docker tag maxschridde/groovestack-core-app maxschridde/groovestack-core-app:latest
+  docker-push:
+    cmds:
+      - docker push maxschridde/groovestack-core-app
+  docker-stop:
+    cmds:
+      - docker stop groovestack-core-app
+  docker-layers:
+    cmds:
+      - docker image history maxschridde/groovestack-core-app
+  docker-ls:
+    desc: "List all docker images"
+    cmds:
+      - docker images ls
+  docker-running:
+    desc: "List all running docker containers"
+    cmds:
+      - docker ps
+  docker-all:
+    desc: "List all docker containers"
+    cmds:
+      - docker ps -a

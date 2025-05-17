@@ -22,7 +22,7 @@ export const useEmailOtp = () => {
     })
   }, [])
 
-  const handleSubmit = useCallback(async (request) => {    
+  const handleSubmit = useCallback(async (request: Request) => {    
     try {
 
       const response = await fetch(request)
