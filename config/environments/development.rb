@@ -87,5 +87,4 @@ host_options = {
 }
 
 Rails.application.routes.default_url_options = host_options
-Rails.application.config.action_controller.asset_host
 Rails.application.config.action_mailer.asset_host = host_options[:host]

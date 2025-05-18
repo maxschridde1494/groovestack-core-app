@@ -1,33 +1,24 @@
+import fs from 'fs'
 import { defineConfig } from 'vite'
 import react from "@vitejs/plugin-react";
 import RubyPlugin from 'vite-plugin-ruby'
 
 export default defineConfig({
   plugins: [
-    // react(),
+    react(),
     RubyPlugin(),
   ],
   server: {
-    host: true,
+    https: {
+      key: fs.readFileSync('./vite.groovestack-core.test-key.pem'),
+      cert: fs.readFileSync('./vite.groovestack-core.test.pem'),
+    },
+    hmr: {
+      protocol: 'wss',
+      host: 'vite.groovestack-core.test',
+    },
   },
   build: {
     sourcemap: true,
   },
 })
-
-
-// import { defineConfig } from "vite";
-// import react from "@vitejs/plugin-react";
-// import RubyPlugin from 'vite-plugin-ruby'
-
-// // https://vitejs.dev/config/
-// export default defineConfig(({ mode }) => ({
-//   plugins: [react(), RubyPlugin()],
-//   server: {
-//     host: true,
-//   },
-//   build: {
-//     sourcemap: mode === "development",
-//   },
-//   base: "./",
-// }));
