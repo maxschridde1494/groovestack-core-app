@@ -89,7 +89,7 @@ export const LoginPage = ({
     >
       <Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-          <Avatar src="images/logo-glyph.png" sx={{ width: 40, height: 40 }} />
+          <Avatar src="images/talysto.png" sx={{ width: 40, height: 40 }} />
           <Box>
             <Typography variant="h4" color="text.primary">
               Groovestack Core
