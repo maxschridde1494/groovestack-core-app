@@ -39,6 +39,10 @@ tasks:
     cmds:
       - bin/dev
     prefix: rails-vite
+  docker-dev:
+    cmds:
+      - bin/docker-dev
+    prefix: docker-dev
   dev-full:
     deps:
       - task: dev
