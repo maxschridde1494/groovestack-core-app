@@ -82,8 +82,8 @@ end
 
 
 host_options = {
-  host: 'groovestack-core.test',
-  protocol: 'https'
+  host: 'localhost',
+  protocol: 'http'
 }
 
 Rails.application.routes.default_url_options = host_options
