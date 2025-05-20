@@ -39,6 +39,10 @@ tasks:
     cmds:
       - bin/dev
     prefix: rails-vite
+  puma-dev:
+    cmds:
+      - bin/puma-dev
+    prefix: puma-dev
   dev-full:
     deps:
       - task: dev
