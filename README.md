@@ -28,7 +28,18 @@ This application uses Rails credentials for secure configuration. You'll need to
    cp .env.sample .env
    ```
 
-2. Update the `.env` file with your `RAILS_MASTER_KEY`. This key is required for decrypting Rails credentials.
+2. For this sandbox application, use the following test master key:
+   ```bash
+   # In config/master.key
+   58d3b4a1cee561b9e0a41ae94d68b557
+   ```
+
+   ⚠️ **Important**: This is a sandbox master key and should never be used in production environments.
+
+3. You can view or edit the credentials using Cursor as your editor:
+   ```bash
+   EDITOR='cursor --wait' bundle exec rails credentials:edit
+   ```
 
 ## Getting Started
 
